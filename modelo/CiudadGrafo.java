@@ -29,5 +29,20 @@ public class CiudadGrafo {
         }
     }
 
-    
+    public Collection<Zona> getZonas() {
+        return zonas.values();
+    }
+
+    public Zona getZona(String nombre) {
+        return zonas.get(nombre);
+    }
+
+    public void mostrarGrafo() {
+        for (Zona z : zonas.values()) {
+            System.out.println(z.getNombre() + " conectado a:");
+            for (Map.Entry<Zona, Integer> entry : z.getConexiones().entrySet()) {
+                System.out.println("  → " + entry.getKey().getNombre() + " (peso " + entry.getValue() + ")");
+            }
+        }
+    }
 }
