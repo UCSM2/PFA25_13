@@ -77,6 +77,15 @@ public class AlgoritmosDeGrafos {
         dfsRecursivo(inicio, visitados);
         System.out.println("FIN");
     }
+    private static void dfsRecursivo(Zona actual, Set<Zona> visitados) {
+        System.out.print(actual.getNombre() + " → ");
+        visitados.add(actual);
 
+        for (Zona vecino : actual.getConexiones().keySet()) {
+            if (!visitados.contains(vecino)) {
+                dfsRecursivo(vecino, visitados);
+            }
+        }
+    }
     
 }
