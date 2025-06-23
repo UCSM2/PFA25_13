@@ -87,5 +87,20 @@ public class AlgoritmosDeGrafos {
             }
         }
     }
+
+    public static boolean tieneCiclos(CiudadGrafo grafo) {
+        Set<Zona> visitados = new HashSet<>();
+        Set<Zona> enRecorrido = new HashSet<>();
+
+        for (Zona zona : grafo.getZonas()) {
+            if (!visitados.contains(zona)) {
+                if (dfsCiclo(zona, visitados, enRecorrido)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     
 }
