@@ -1,32 +1,37 @@
 package modelo;
 
 import modelo.bplus.BPlusTree;
-
 import java.util.*;
 
-public class Zona{
+public class Zona {
     private String nombre;
-    private Map<Zona, Integer> conexiones; //Conexiones a otras zonas(vías)
+    private Map<Zona, Integer> conexiones;
+    private BPlusTree<String, String> arbolBMas;
 
-
-    public Zona(String nombre){
+    public Zona(String nombre) {
         this.nombre = nombre;
         this.conexiones = new HashMap<>();
+        this.arbolBMas = new BPlusTree<>(3);
     }
 
-    public String getNombre(){
+    public String getNombre() {
         return nombre;
     }
 
-    public void conectarCon(Zona destino, int peso){
+    public void conectarCon(Zona destino, int peso) {
         conexiones.put(destino, peso);
     }
 
-    public Map<Zona,Integer> getConexiones(){
+    public Map<Zona, Integer> getConexiones() {
         return conexiones;
     }
 
-    public String toString(){
+    public BPlusTree<String, String> getArbolBMas() {
+        return arbolBMas;
+    }
+
+    @Override
+    public String toString() {
         return nombre;
     }
 }
