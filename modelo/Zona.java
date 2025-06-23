@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.bplus.BPlusTree;
+
 import java.util.*;
 
 public class Zona{
