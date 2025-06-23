@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+        "type": "java",
+        "name": "InterfazGrafica",
+        "request": "launch",
+        "mainClass": "main.InterfazGrafica",
+        "projectName": "PFA25_13_741537e0"
+    },
+    {
+        "type": "java",
+        "name": "Ejecutar Interfaz JavaFX",
+        "request": "launch",
+        "mainClass": "main.InterfazGrafica",
+        "vmArgs": "--module-path lib --add-modules javafx.controls -Dprism.order=sw",
+        "projectName": "PFA25_13"
+    }
+]
+}
