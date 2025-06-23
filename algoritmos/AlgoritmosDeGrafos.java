@@ -102,5 +102,77 @@ public class AlgoritmosDeGrafos {
 
         return false;
     }
+
+    private static boolean dfsCiclo(Zona actual, Set<Zona> visitados, Set<Zona> enRecorrido) {
+        visitados.add(actual);
+        enRecorrido.add(actual);
+
+        for (Zona vecino : actual.getConexiones().keySet()) {
+            if (!visitados.contains(vecino)) {
+                if (dfsCiclo(vecino, visitados, enRecorrido)) {
+                    return true;
+                }
+            } else if (enRecorrido.contains(vecino)) {
+                return true;
+            }
+        }
+
+        enRecorrido.remove(actual);
+        return false;
+    }
+
+    public static List<Set<Zona>> componentesConexas(CiudadGrafo grafo) {
+        Set<Zona> visitados = new HashSet<>();
+        List<Set<Zona>> componentes = new ArrayList<>();
+
+        for (Zona zona : grafo.getZonas()) {
+            if (!visitados.contains(zona)) {
+                Set<Zona> componente = new HashSet<>();
+                dfsComponente(zona, componente);
+                componentes.add(componente);
+                visitados.addAll(componente);
+            }
+        }
+
+        return componentes;
+    }
+
+    private static void dfsComponente(Zona actual, Set<Zona> componente) {
+        componente.add(actual);
+
+        for (Zona vecino : actual.getConexiones().keySet()) {
+            if (!componente.contains(vecino)) {
+                dfsComponente(vecino, componente);
+            }
+        }
+
+        for (Zona posibleVecino : componente) {
+            if (posibleVecino.getConexiones().containsKey(actual) && !componente.contains(posibleVecino)) {
+                dfsComponente(posibleVecino, componente);
+            }
+        }
+    }
+
+    public static List<Zona> zonasAisladas(CiudadGrafo grafo) {
+        List<Zona> aisladas = new ArrayList<>();
+
+        for (Zona z : grafo.getZonas()) {
+            boolean tieneSalida = !z.getConexiones().isEmpty();
+            boolean tieneEntrada = false;
+
+            for (Zona otra : grafo.getZonas()) {
+                if (otra.getConexiones().containsKey(z)) {
+                    tieneEntrada = true;
+                    break;
+                }
+            }
+
+            if (!tieneSalida && !tieneEntrada) {
+                aisladas.add(z);
+            }
+        }
+
+        return aisladas;
+    }
     
 }
