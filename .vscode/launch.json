@@ -3,6 +3,13 @@
   "configurations": [
     {
         "type": "java",
+        "name": "ConsolaInteractiva",
+        "request": "launch",
+        "mainClass": "main.ConsolaInteractiva",
+        "projectName": "PFA25_13_741537e0"
+    },
+    {
+        "type": "java",
         "name": "InterfazGrafica",
         "request": "launch",
         "mainClass": "main.InterfazGrafica",
