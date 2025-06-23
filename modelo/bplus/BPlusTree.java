@@ -103,7 +103,7 @@ class LeafNode<K extends Comparable<K>, V> extends Node<K, V> {
         LeafNode<K, V> current = this;
         while (current != null) {
             for (int i = 0; i < current.keys.size(); i++) {
-                System.out.println(current.keys.get(i) + " → " + current.values.get(i));
+                System.out.println(current.keys.get(i) + " -> " + current.values.get(i));
             }
             current = current.next;
         }
