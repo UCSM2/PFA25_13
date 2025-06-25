@@ -18,7 +18,7 @@ public class InterfazSwing extends JFrame {
     private JTextField pesoInput = new JTextField(5);
     private JTextField buscarField = new JTextField(10);
     private boolean modoAgregarZona = false;
-    private ImageIcon zonaIcon = new ImageIcon("img/zona.png"); // imagen de la zona
+    private ImageIcon zonaIcon = new ImageIcon("img/zona.png");
 
     public InterfazSwing() {
         setTitle("Sistema de Zonas Urbanas Interactivo");
@@ -37,8 +37,9 @@ public class InterfazSwing extends JFrame {
         JButton simularCierreBtn = new JButton("Simular cierre de vía");
         JButton btnAnalisis = new JButton("Análisis del sistema");
         JButton conectarBtn = new JButton("Conectar Zonas");
+        JButton btnVerArbolGrafico = new JButton("Ver árbol B+ gráfico");
 
-        // === Panel de botones en dos filas ===
+        // Paneles de botones
         JPanel panelFila1 = new JPanel();
         panelFila1.add(btnModoAgregar);
         panelFila1.add(new JLabel("Peso:"));
@@ -57,19 +58,19 @@ public class InterfazSwing extends JFrame {
         panelFila2.add(tablaElementosBtn);
         panelFila2.add(simularCierreBtn);
         panelFila2.add(btnAnalisis);
+        panelFila2.add(btnVerArbolGrafico);
 
         JPanel panelInferior = new JPanel(new GridLayout(2, 1));
         panelInferior.add(panelFila1);
         panelInferior.add(panelFila2);
 
-        // === Área de salida ===
         output.setEditable(false);
         JScrollPane scroll = new JScrollPane(output);
 
         canvas.setPreferredSize(new Dimension(1000, 600));
         canvas.setBackground(Color.WHITE);
 
-        // === Eventos ===
+        // === EVENTOS ===
         btnModoAgregar.addActionListener(e -> {
             modoAgregarZona = !modoAgregarZona;
             btnModoAgregar.setText(modoAgregarZona ? "Modo: Click para agregar" : "Modo: Agregar Zona");
@@ -231,28 +232,33 @@ public class InterfazSwing extends JFrame {
             output.append("Zona con más elementos: " + zonaMas + "\n");
         });
 
+        btnVerArbolGrafico.addActionListener(e -> {
+            if (grafo.getZonas().isEmpty()) return;
+            String[] zonas = grafo.getZonas().stream().map(Zona::getNombre).toArray(String[]::new);
+            String seleccion = (String) JOptionPane.showInputDialog(this, "Selecciona una zona:", "Árbol B+ gráfico", JOptionPane.PLAIN_MESSAGE, null, zonas, zonas[0]);
+            if (seleccion != null) {
+                Zona zona = grafo.getZona(seleccion);
+                Map<String, ElementoUrbanistico> hojas = zona.getArbolBMas().getAllLeaves();
+                JFrame frame = new JFrame("Árbol B+ de " + seleccion);
+                frame.setSize(600, 400);
+                frame.setLocationRelativeTo(this);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.add(new ArbolBPlusPanel(hojas));
+                frame.setVisible(true);
+            }
+        });
+
         add(scroll, BorderLayout.NORTH);
         add(canvas, BorderLayout.CENTER);
         add(panelInferior, BorderLayout.SOUTH);
-
         pack();
         setVisible(true);
     }
 
     class DrawingPanel extends JPanel {
-        private Image fondo;
-
-        public DrawingPanel() {
-            fondo = new ImageIcon("img/fondo.png").getImage(); // fondo personalizado
-        }
-
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            if (fondo != null) {
-                g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
-            }
-
             for (Zona z : grafo.getZonas()) {
                 Point p1 = posiciones.get(z.getNombre());
                 for (Zona dest : z.getConexiones().keySet()) {
@@ -273,12 +279,41 @@ public class InterfazSwing extends JFrame {
         }
     }
 
+    class ArbolBPlusPanel extends JPanel {
+        private Map<String, ElementoUrbanistico> hojas;
+
+        public ArbolBPlusPanel(Map<String, ElementoUrbanistico> hojas) {
+            this.hojas = hojas;
+            setBackground(Color.WHITE);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            int x = 50, y = 100;
+            int spacing = 120;
+            g.setFont(new Font("Arial", Font.PLAIN, 12));
+
+            for (Map.Entry<String, ElementoUrbanistico> entry : hojas.entrySet()) {
+                g.setColor(new Color(173, 216, 230));
+                g.fillRoundRect(x, y, 100, 40, 15, 15);
+                g.setColor(Color.BLACK);
+                g.drawRoundRect(x, y, 100, 40, 15, 15);
+                g.drawString(entry.getKey(), x + 10, y + 15);
+                g.drawString(entry.getValue().getNombre(), x + 10, y + 30);
+                x += spacing;
+                if (x > getWidth() - 150) {
+                    x = 50;
+                    y += 70;
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new InterfazSwing());
     }
 }
-
-
 
 
 
