@@ -13,6 +13,8 @@ public class InterfazCompletaSwing extends JFrame {
     private DrawingPanel canvas = new DrawingPanel();
     private JTextArea output = new JTextArea(6, 60);
     private JTextField pesoInput = new JTextField(5);
+    private boolean modoAgregarZona = false;
+    private ImageIcon zonaIcon = new ImageIcon("img/zona.png"); // Asegúrate de tener esta imagen
 
     public InterfazCompletaSwing() {
         setTitle("Sistema Interactivo de Zonas Urbanas");
@@ -20,11 +22,13 @@ public class InterfazCompletaSwing extends JFrame {
         setLayout(new BorderLayout());
 
         JPanel panelSuperior = new JPanel();
+        JButton btnModoAgregar = new JButton("Modo: Agregar Zona");
         JButton eliminarZonaBtn = new JButton("Eliminar Zona");
         JButton eliminarViaBtn = new JButton("Eliminar Vía");
         JButton mostrarArbolBtn = new JButton("Mostrar árbol B+");
         JButton insertarElementoBtn = new JButton("Insertar en árbol B+");
 
+        panelSuperior.add(btnModoAgregar);
         panelSuperior.add(new JLabel("Peso:"));
         panelSuperior.add(pesoInput);
         JButton conectarBtn = new JButton("Conectar Zonas");
@@ -40,26 +44,21 @@ public class InterfazCompletaSwing extends JFrame {
         canvas.setPreferredSize(new Dimension(800, 500));
         canvas.setBackground(Color.WHITE);
 
+        // Activar o desactivar modo agregar zona
+        btnModoAgregar.addActionListener(e -> {
+            modoAgregarZona = !modoAgregarZona;
+            btnModoAgregar.setText(modoAgregarZona ? "Modo: Click para agregar" : "Modo: Agregar Zona");
+        });
+
         canvas.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) {
+                if (modoAgregarZona && SwingUtilities.isLeftMouseButton(e)) {
                     String nombre = JOptionPane.showInputDialog("Nombre de la nueva zona:");
                     if (nombre != null && !nombre.trim().isEmpty()) {
-                        grafo.agregarZona(nombre);
-                        posiciones.put(nombre, e.getPoint());
+                        grafo.agregarZona(nombre.trim());
+                        posiciones.put(nombre.trim(), e.getPoint());
                         output.append("Zona agregada: " + nombre + "\n");
                         canvas.repaint();
-                    }
-                } else if (SwingUtilities.isRightMouseButton(e)) {
-                    for (Map.Entry<String, Point> entry : posiciones.entrySet()) {
-                        if (entry.getValue().distance(e.getPoint()) < 20) {
-                            String zonaEliminar = entry.getKey();
-                            grafo.eliminarZona(zonaEliminar);
-                            posiciones.remove(zonaEliminar);
-                            output.append("Zona eliminada: " + zonaEliminar + "\n");
-                            canvas.repaint();
-                            break;
-                        }
                     }
                 }
             }
@@ -125,7 +124,7 @@ public class InterfazCompletaSwing extends JFrame {
 
         insertarElementoBtn.addActionListener(e -> {
             if (seleccionOrigen != null) {
-                String tipo = JOptionPane.showInputDialog("Tipo de elemento (ej. Parque):");
+                String tipo = JOptionPane.showInputDialog("Tipo de elemento:");
                 String nombre = JOptionPane.showInputDialog("Nombre del elemento:");
                 if (tipo != null && nombre != null) {
                     seleccionOrigen.getArbolBMas().insert(tipo, nombre);
@@ -144,22 +143,25 @@ public class InterfazCompletaSwing extends JFrame {
     class DrawingPanel extends JPanel {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
+
+            // Dibujar aristas
             for (Zona z : grafo.getZonas()) {
                 Point p1 = posiciones.get(z.getNombre());
-                for (Zona destino : z.getConexiones().keySet()) {
-                    Point p2 = posiciones.get(destino.getNombre());
+                for (Zona dest : z.getConexiones().keySet()) {
+                    Point p2 = posiciones.get(dest.getNombre());
                     g.setColor(Color.GRAY);
                     g.drawLine(p1.x, p1.y, p2.x, p2.y);
                     g.setColor(Color.BLUE);
-                    g.drawString(String.valueOf(z.getConexiones().get(destino)), (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+                    g.drawString(String.valueOf(z.getConexiones().get(dest)), (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
                 }
             }
+
+            // Dibujar zonas con imagen
             for (Map.Entry<String, Point> entry : posiciones.entrySet()) {
                 Point p = entry.getValue();
-                g.setColor(Color.ORANGE);
-                g.fillOval(p.x - 20, p.y - 20, 40, 40);
+                g.drawImage(zonaIcon.getImage(), p.x - 20, p.y - 20, 40, 40, this);
                 g.setColor(Color.BLACK);
-                g.drawString(entry.getKey(), p.x - 15, p.y + 5);
+                g.drawString(entry.getKey(), p.x - 15, p.y + 35);
             }
         }
     }
