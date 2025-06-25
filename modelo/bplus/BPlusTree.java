@@ -49,11 +49,28 @@ public class BPlusTree<K extends Comparable<K>, V> {
         }
         return resultado;
     }
+
+    public List<String> getLeafNodesAsStrings() {
+        List<String> result = new ArrayList<>();
+        Node<K, V> node = root;
+        while (node instanceof InternalNode) {
+            node = ((InternalNode<K, V>) node).children.get(0);
+        }
+        LeafNode<K, V> hoja = (LeafNode<K, V>) node;
+        while (hoja != null) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hoja.keys.size(); i++) {
+                sb.append(hoja.keys.get(i)).append(":").append(hoja.values.get(i)).append("  ");
+            }
+            result.add(sb.toString().trim());
+            hoja = hoja.next;
+        }
+        return result;
+    }
 }
 
 
 // Clases internas del árbol B+
-
 
 abstract class Node<K extends Comparable<K>, V> {
     abstract SplitResult<K, V> insert(K key, V value, int maxKeys);
@@ -194,7 +211,5 @@ class SplitResult<K extends Comparable<K>, V> {
         this.right = right;
     }
 }
-
-
 
 
