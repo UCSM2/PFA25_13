@@ -33,6 +33,22 @@ public class BPlusTree<K extends Comparable<K>, V> {
     public void printLeaves() {
         root.printLeaves();
     }
+
+    public Map<K, V> getAllLeaves() {
+        Map<K, V> resultado = new LinkedHashMap<>();
+        Node<K, V> node = root;
+        while (node instanceof InternalNode) {
+            node = ((InternalNode<K, V>) node).children.get(0);
+        }
+        LeafNode<K, V> hoja = (LeafNode<K, V>) node;
+        while (hoja != null) {
+            for (int i = 0; i < hoja.keys.size(); i++) {
+                resultado.put(hoja.keys.get(i), hoja.values.get(i));
+            }
+            hoja = hoja.next;
+        }
+        return resultado;
+    }
 }
 
 
@@ -178,3 +194,7 @@ class SplitResult<K extends Comparable<K>, V> {
         this.right = right;
     }
 }
+
+
+
+
