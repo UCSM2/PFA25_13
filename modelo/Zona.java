@@ -1,12 +1,13 @@
 package modelo;
 
 import modelo.bplus.BPlusTree;
+import modelo.bplus.ElementoUrbanistico;
 import java.util.*;
 
 public class Zona {
     private String nombre;
     private Map<Zona, Integer> conexiones;
-    private BPlusTree<String, String> arbolBMas;
+    private BPlusTree<String, ElementoUrbanistico> arbolBMas;
 
     public Zona(String nombre) {
         this.nombre = nombre;
@@ -26,7 +27,7 @@ public class Zona {
         return conexiones;
     }
 
-    public BPlusTree<String, String> getArbolBMas() {
+    public BPlusTree<String, ElementoUrbanistico> getArbolBMas() {
         return arbolBMas;
     }
 
