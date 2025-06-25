@@ -2,10 +2,12 @@ package main;
 
 import modelo.*;
 import modelo.bplus.ElementoUrbanistico;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 public class InterfazSwing extends JFrame {
     private CiudadGrafo grafo = new CiudadGrafo();
@@ -14,39 +16,60 @@ public class InterfazSwing extends JFrame {
     private DrawingPanel canvas = new DrawingPanel();
     private JTextArea output = new JTextArea(6, 60);
     private JTextField pesoInput = new JTextField(5);
+    private JTextField buscarField = new JTextField(10);
     private boolean modoAgregarZona = false;
-    private ImageIcon zonaIcon = new ImageIcon("img/zona.png"); // asegúrate de tener esta imagen
+    private ImageIcon zonaIcon = new ImageIcon("img/zona.png"); // imagen de la zona
 
     public InterfazSwing() {
-        setTitle("Sistema de Zonas Urbanas con Elementos");
+        setTitle("Sistema de Zonas Urbanas Interactivo");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel panelSuperior = new JPanel();
+        // === Botones ===
         JButton btnModoAgregar = new JButton("Modo: Agregar Zona");
         JButton eliminarZonaBtn = new JButton("Eliminar Zona");
         JButton eliminarViaBtn = new JButton("Eliminar Vía");
         JButton mostrarArbolBtn = new JButton("Mostrar árbol B+");
         JButton insertarElementoBtn = new JButton("Insertar Elemento");
         JButton verElementosBtn = new JButton("Ver Elementos");
-
-        panelSuperior.add(btnModoAgregar);
-        panelSuperior.add(new JLabel("Peso:"));
-        panelSuperior.add(pesoInput);
+        JButton buscarBtn = new JButton("Buscar elemento");
+        JButton tablaElementosBtn = new JButton("Mostrar Tabla B+");
+        JButton simularCierreBtn = new JButton("Simular cierre de vía");
+        JButton btnAnalisis = new JButton("Análisis del sistema");
         JButton conectarBtn = new JButton("Conectar Zonas");
-        panelSuperior.add(conectarBtn);
-        panelSuperior.add(eliminarViaBtn);
-        panelSuperior.add(eliminarZonaBtn);
-        panelSuperior.add(mostrarArbolBtn);
-        panelSuperior.add(insertarElementoBtn);
-        panelSuperior.add(verElementosBtn);
 
+        // === Panel de botones en dos filas ===
+        JPanel panelFila1 = new JPanel();
+        panelFila1.add(btnModoAgregar);
+        panelFila1.add(new JLabel("Peso:"));
+        panelFila1.add(pesoInput);
+        panelFila1.add(conectarBtn);
+        panelFila1.add(eliminarViaBtn);
+        panelFila1.add(eliminarZonaBtn);
+        panelFila1.add(mostrarArbolBtn);
+        panelFila1.add(insertarElementoBtn);
+        panelFila1.add(verElementosBtn);
+
+        JPanel panelFila2 = new JPanel();
+        panelFila2.add(new JLabel("Buscar:"));
+        panelFila2.add(buscarField);
+        panelFila2.add(buscarBtn);
+        panelFila2.add(tablaElementosBtn);
+        panelFila2.add(simularCierreBtn);
+        panelFila2.add(btnAnalisis);
+
+        JPanel panelInferior = new JPanel(new GridLayout(2, 1));
+        panelInferior.add(panelFila1);
+        panelInferior.add(panelFila2);
+
+        // === Área de salida ===
         output.setEditable(false);
         JScrollPane scroll = new JScrollPane(output);
 
-        canvas.setPreferredSize(new Dimension(800, 500));
+        canvas.setPreferredSize(new Dimension(1000, 600));
         canvas.setBackground(Color.WHITE);
 
+        // === Eventos ===
         btnModoAgregar.addActionListener(e -> {
             modoAgregarZona = !modoAgregarZona;
             btnModoAgregar.setText(modoAgregarZona ? "Modo: Click para agregar" : "Modo: Agregar Zona");
@@ -69,12 +92,13 @@ public class InterfazSwing extends JFrame {
                 for (String nombre : posiciones.keySet()) {
                     if (posiciones.get(nombre).distance(e.getPoint()) < 20) {
                         Zona z = grafo.getZona(nombre);
-                        if (seleccionOrigen == null) {
-                            seleccionOrigen = z;
-                            output.append("Origen: " + nombre + "\n");
-                        } else {
+                        if (seleccionOrigen != null && seleccionOrigen != z) {
                             seleccionDestino = z;
-                            output.append("Destino: " + nombre + "\n");
+                            output.append("Destino: " + z.getNombre() + "\n");
+                        } else {
+                            seleccionOrigen = z;
+                            seleccionDestino = null;
+                            output.append("Zona seleccionada: " + z.getNombre() + "\n");
                         }
                         break;
                     }
@@ -117,42 +141,118 @@ public class InterfazSwing extends JFrame {
             }
         });
 
-        mostrarArbolBtn.addActionListener(e -> {
-            if (seleccionOrigen != null) {
-                output.append("Árbol B+ de " + seleccionOrigen.getNombre() + ":\n");
-                seleccionOrigen.getArbolBMas().printLeaves();
-            }
-        });
-
         insertarElementoBtn.addActionListener(e -> {
-            if (seleccionOrigen != null) {
+            if (grafo.getZonas().isEmpty()) return;
+            String[] zonas = grafo.getZonas().stream().map(Zona::getNombre).toArray(String[]::new);
+            String seleccion = (String) JOptionPane.showInputDialog(this, "Selecciona una zona:", "Insertar elemento", JOptionPane.PLAIN_MESSAGE, null, zonas, zonas[0]);
+            if (seleccion != null) {
                 String tipo = JOptionPane.showInputDialog("Tipo de elemento:");
                 String nombre = JOptionPane.showInputDialog("Nombre del elemento:");
                 if (tipo != null && nombre != null) {
                     ElementoUrbanistico elem = new ElementoUrbanistico(tipo, nombre);
-                    seleccionOrigen.getArbolBMas().insert(tipo, elem);
-                    output.append("Insertado: " + tipo + " - " + nombre + "\n");
+                    grafo.getZona(seleccion).getArbolBMas().insert(tipo, elem);
+                    output.append("Insertado: " + tipo + " - " + nombre + " en " + seleccion + "\n");
                 }
             }
         });
 
         verElementosBtn.addActionListener(e -> {
-            if (seleccionOrigen != null) {
-                output.append("Elementos en " + seleccionOrigen.getNombre() + ":\n");
-                seleccionOrigen.getArbolBMas().printLeaves();
+            if (grafo.getZonas().isEmpty()) return;
+            String[] zonas = grafo.getZonas().stream().map(Zona::getNombre).toArray(String[]::new);
+            String seleccion = (String) JOptionPane.showInputDialog(this, "Selecciona una zona:", "Ver elementos", JOptionPane.PLAIN_MESSAGE, null, zonas, zonas[0]);
+            if (seleccion != null) {
+                output.append("Elementos en " + seleccion + ":\n");
+                grafo.getZona(seleccion).getArbolBMas().printLeaves();
             }
         });
 
-        add(panelSuperior, BorderLayout.NORTH);
+        mostrarArbolBtn.addActionListener(e -> {
+            if (grafo.getZonas().isEmpty()) return;
+            String[] zonas = grafo.getZonas().stream().map(Zona::getNombre).toArray(String[]::new);
+            String seleccion = (String) JOptionPane.showInputDialog(this, "Selecciona una zona:", "Mostrar árbol B+", JOptionPane.PLAIN_MESSAGE, null, zonas, zonas[0]);
+            if (seleccion != null) {
+                output.append("Árbol B+ de " + seleccion + ":\n");
+                grafo.getZona(seleccion).getArbolBMas().printLeaves();
+            }
+        });
+
+        tablaElementosBtn.addActionListener(e -> {
+            if (grafo.getZonas().isEmpty()) return;
+            String[] zonas = grafo.getZonas().stream().map(Zona::getNombre).toArray(String[]::new);
+            String seleccion = (String) JOptionPane.showInputDialog(this, "Selecciona una zona:", "Mostrar tabla B+", JOptionPane.PLAIN_MESSAGE, null, zonas, zonas[0]);
+            if (seleccion != null) {
+                List<String[]> datos = grafo.getZona(seleccion).obtenerElementosComoTabla();
+                JTable tabla = new JTable(new javax.swing.table.DefaultTableModel(
+                        datos.toArray(new Object[0][0]),
+                        new String[]{"Tipo", "Nombre"}
+                ));
+                JOptionPane.showMessageDialog(this, new JScrollPane(tabla), "Elementos en " + seleccion, JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        buscarBtn.addActionListener(e -> {
+            String clave = buscarField.getText().trim();
+            if (!clave.isEmpty()) {
+                for (Zona zona : grafo.getZonas()) {
+                    ElementoUrbanistico res = zona.getArbolBMas().search(clave);
+                    if (res != null) {
+                        output.append("Encontrado en " + zona.getNombre() + ": " + res + "\n");
+                        return;
+                    }
+                }
+                output.append("Elemento no encontrado: " + clave + "\n");
+            }
+        });
+
+        simularCierreBtn.addActionListener(e -> {
+            List<Zona> zonas = new ArrayList<>(grafo.getZonas());
+            if (zonas.size() >= 2) {
+                Zona z1 = zonas.get(new Random().nextInt(zonas.size()));
+                if (!z1.getConexiones().isEmpty()) {
+                    Zona destino = z1.getConexiones().keySet().iterator().next();
+                    grafo.eliminarVia(z1.getNombre(), destino.getNombre());
+                    output.append("Vía cerrada entre " + z1.getNombre() + " y " + destino.getNombre() + "\n");
+                    canvas.repaint();
+                }
+            }
+        });
+
+        btnAnalisis.addActionListener(e -> {
+            int zonas = grafo.getZonas().size();
+            int aristas = grafo.getZonas().stream().mapToInt(z -> z.getConexiones().size()).sum();
+            int totalElementos = grafo.getZonas().stream().mapToInt(z -> z.getArbolBMas().getAllLeaves().size()).sum();
+            String zonaMas = grafo.getZonas().stream()
+                    .max(Comparator.comparingInt(z -> z.getArbolBMas().getAllLeaves().size()))
+                    .map(Zona::getNombre).orElse("Ninguna");
+            output.append("📊 Análisis del sistema:\n");
+            output.append("Zonas: " + zonas + "\n");
+            output.append("Vías: " + aristas + "\n");
+            output.append("Elementos urbanos: " + totalElementos + "\n");
+            output.append("Zona con más elementos: " + zonaMas + "\n");
+        });
+
+        add(scroll, BorderLayout.NORTH);
         add(canvas, BorderLayout.CENTER);
-        add(scroll, BorderLayout.SOUTH);
+        add(panelInferior, BorderLayout.SOUTH);
+
         pack();
         setVisible(true);
     }
 
     class DrawingPanel extends JPanel {
+        private Image fondo;
+
+        public DrawingPanel() {
+            fondo = new ImageIcon("img/fondo.png").getImage(); // fondo personalizado
+        }
+
+        @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
+            if (fondo != null) {
+                g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
+            }
+
             for (Zona z : grafo.getZonas()) {
                 Point p1 = posiciones.get(z.getNombre());
                 for (Zona dest : z.getConexiones().keySet()) {
@@ -163,6 +263,7 @@ public class InterfazSwing extends JFrame {
                     g.drawString(String.valueOf(z.getConexiones().get(dest)), (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
                 }
             }
+
             for (Map.Entry<String, Point> entry : posiciones.entrySet()) {
                 Point p = entry.getValue();
                 g.drawImage(zonaIcon.getImage(), p.x - 20, p.y - 20, 40, 40, this);
@@ -176,4 +277,10 @@ public class InterfazSwing extends JFrame {
         SwingUtilities.invokeLater(() -> new InterfazSwing());
     }
 }
+
+
+
+
+
+
 
