@@ -3,6 +3,20 @@
   "configurations": [
     {
         "type": "java",
+        "name": "InterfazCompletaSwing",
+        "request": "launch",
+        "mainClass": "main.InterfazCompletaSwing",
+        "projectName": "PFA25_13_741537e0"
+    },
+    {
+        "type": "java",
+        "name": "InterfazVisualSwing",
+        "request": "launch",
+        "mainClass": "main.InterfazVisualSwing",
+        "projectName": "PFA25_13_741537e0"
+    },
+    {
+        "type": "java",
         "name": "InterfazSwing",
         "request": "launch",
         "mainClass": "main.InterfazSwing",
