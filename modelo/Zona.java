@@ -31,8 +31,22 @@ public class Zona {
         return arbolBMas;
     }
 
+    /**
+     * Retorna los elementos del árbol B+ en forma de tabla (tipo, nombre),
+     * útil para mostrar en un JTable.
+     */
+    public List<String[]> obtenerElementosComoTabla() {
+        List<String[]> datos = new ArrayList<>();
+        Map<String, ElementoUrbanistico> elementos = arbolBMas.getAllLeaves();
+        for (ElementoUrbanistico e : elementos.values()) {
+            datos.add(new String[]{e.getTipo(), e.getNombre()});
+        }
+        return datos;
+    }
+
     @Override
     public String toString() {
         return nombre;
     }
 }
+
