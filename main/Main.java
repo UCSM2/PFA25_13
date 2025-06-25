@@ -1,6 +1,7 @@
 package main;
 
 import modelo.*;
+import modelo.bplus.ElementoUrbanistico;
 import algoritmos.AlgoritmosDeGrafos;
 
 import java.util.*;
@@ -24,11 +25,11 @@ public class Main {
         Zona zonaA = grafo.getZona("Zona A");
         Zona zonaB = grafo.getZona("Zona B");
 
-        zonaA.getArbolBMas().insert("Parque", "Parque Central");
-        zonaA.getArbolBMas().insert("Hospital", "Hospital Sur");
+        zonaA.getArbolBMas().insert("Parque", new ElementoUrbanistico("Parque", "Parque Central"));
+        zonaA.getArbolBMas().insert("Hospital", new ElementoUrbanistico("Hospital", "Hospital Sur"));
 
-        zonaB.getArbolBMas().insert("Comercial", "Centro Comercial Norte");
-        zonaB.getArbolBMas().insert("Parque", "Parque Infantil");
+        zonaB.getArbolBMas().insert("Comercial", new ElementoUrbanistico("Comercial", "Centro Comercial Norte"));
+        zonaB.getArbolBMas().insert("Parque", new ElementoUrbanistico("Parque", "Parque Infantil"));
 
         // Mostrar árbol B+ de zonaB
         System.out.println("\nElementos en Zona B:");
@@ -41,7 +42,8 @@ public class Main {
         System.out.println("\nRutas normales desde Zona A:");
         Map<Zona, Integer> distanciasAntes = AlgoritmosDeGrafos.dijkstra(grafo, zonaA);
         for (Zona z : distanciasAntes.keySet()) {
-            System.out.println(" → " + z.getNombre() + ": " + (distanciasAntes.get(z) == Integer.MAX_VALUE ? "Inaccesible" : distanciasAntes.get(z)));
+            System.out.println(" → " + z.getNombre() + ": " +
+                (distanciasAntes.get(z) == Integer.MAX_VALUE ? "Inaccesible" : distanciasAntes.get(z)));
         }
 
         // Simulación: cerrar vía
@@ -52,7 +54,8 @@ public class Main {
         System.out.println("\nRutas luego del cierre desde Zona A:");
         Map<Zona, Integer> distanciasDespues = AlgoritmosDeGrafos.dijkstra(grafo, zonaA);
         for (Zona z : distanciasDespues.keySet()) {
-            System.out.println(" → " + z.getNombre() + ": " + (distanciasDespues.get(z) == Integer.MAX_VALUE ? "Inaccesible" : distanciasDespues.get(z)));
+            System.out.println(" → " + z.getNombre() + ": " +
+                (distanciasDespues.get(z) == Integer.MAX_VALUE ? "Inaccesible" : distanciasDespues.get(z)));
         }
 
         // BFS y DFS
