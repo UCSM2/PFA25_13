@@ -1,6 +1,7 @@
 package main;
 
 import modelo.*;
+import modelo.bplus.ElementoUrbanistico;
 import algoritmos.AlgoritmosDeGrafos;
 import java.util.*;
 
@@ -51,9 +52,9 @@ public class ConsolaInteractiva {
 
     private static void mostrarConexiones() {
         for (Zona z : grafo.getZonas()) {
-            System.out.println(z.getNombre() + " → ");
+            System.out.println(z.getNombre() + " -> ");
             for (Zona destino : z.getConexiones().keySet()) {
-                System.out.println("  → " + destino.getNombre() + " (" + z.getConexiones().get(destino) + ")");
+                System.out.println("  -> " + destino.getNombre() + " (" + z.getConexiones().get(destino) + ")");
             }
         }
     }
@@ -77,7 +78,8 @@ public class ConsolaInteractiva {
             String tipo = scanner.nextLine();
             System.out.print("Nombre del elemento: ");
             String nombre = scanner.nextLine();
-            z.getArbolBMas().insert(tipo, nombre);
+            ElementoUrbanistico elemento = new ElementoUrbanistico(tipo, nombre);
+            z.getArbolBMas().insert(tipo, elemento);
             System.out.println("Elemento insertado correctamente.");
         } else {
             System.out.println("Zona no encontrada.");
@@ -92,7 +94,7 @@ public class ConsolaInteractiva {
             System.out.println("Distancias desde " + origen.getNombre() + ":");
             for (Zona z : distancias.keySet()) {
                 int d = distancias.get(z);
-                System.out.println(" → " + z.getNombre() + ": " + (d == Integer.MAX_VALUE ? "Inaccesible" : d));
+                System.out.println(" -> " + z.getNombre() + ": " + (d == Integer.MAX_VALUE ? "Inaccesible" : d));
             }
         } else {
             System.out.println("Zona no encontrada.");
@@ -115,7 +117,7 @@ public class ConsolaInteractiva {
             System.out.println("No hay zonas aisladas.");
         } else {
             for (Zona z : aisladas) {
-                System.out.println(" → " + z.getNombre());
+                System.out.println(" -> " + z.getNombre());
             }
         }
     }
