@@ -45,4 +45,16 @@ public class CiudadGrafo {
             }
         }
     }
+
+    public void eliminarZona(String nombre) {
+    Zona zona = zonas.get(nombre);
+    if (zona != null) {
+        // Eliminar referencias a esta zona desde otras zonas
+        for (Zona z : zonas.values()) {
+            z.getConexiones().remove(zona);
+        }
+        zonas.remove(nombre);
+    }
+}
+
 }
