@@ -34,7 +34,7 @@ public class InterfazSwing extends JFrame {
             }
         });
 
-        // Panel medio para elementos y árbol
+        // Panel medio para acciones
         JPanel midPanel = new JPanel();
         midPanel.add(new JLabel("Zonas:"));
         midPanel.add(zonasBox);
@@ -60,10 +60,23 @@ public class InterfazSwing extends JFrame {
             Zona z = grafo.getZona(zona);
             if (z != null) {
                 output.append("Árbol B+ en " + zona + ":\n");
-                z.getArbolBMas().printLeaves(); // Puedes adaptar esto para que imprima en output si deseas
+                z.getArbolBMas().printLeaves(); // Esto imprime en consola
             }
         });
         midPanel.add(mostrarArbolBtn);
+
+        // 🔹 Nuevo botón: Ver conexiones entre zonas
+        JButton verConexionesBtn = new JButton("Ver Conexiones");
+        verConexionesBtn.addActionListener(e -> {
+            output.append("\nConexiones entre zonas:\n");
+            for (Zona z : grafo.getZonas()) {
+                for (Zona destino : z.getConexiones().keySet()) {
+                    int peso = z.getConexiones().get(destino);
+                    output.append(z.getNombre() + " → " + destino.getNombre() + " (" + peso + ")\n");
+                }
+            }
+        });
+        midPanel.add(verConexionesBtn);
 
         // Área de salida
         output.setEditable(false);
@@ -71,7 +84,7 @@ public class InterfazSwing extends JFrame {
         add(midPanel, BorderLayout.CENTER);
         add(new JScrollPane(output), BorderLayout.SOUTH);
 
-        setSize(700, 400);
+        setSize(750, 450);
         setVisible(true);
     }
 
