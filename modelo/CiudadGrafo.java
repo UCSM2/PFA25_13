@@ -3,7 +3,7 @@ package modelo;
 import java.util.*;
 
 public class CiudadGrafo {
-        private Map<String, Zona> zonas;
+    private Map<String, Zona> zonas;
 
     public CiudadGrafo() {
         zonas = new HashMap<>();
@@ -29,12 +29,23 @@ public class CiudadGrafo {
         }
     }
 
-    public Collection<Zona> getZonas() {
-        return zonas.values();
+    public void eliminarZona(String nombre) {
+        Zona zona = zonas.get(nombre);
+        if (zona != null) {
+            // Eliminar referencias a esta zona desde otras zonas
+            for (Zona z : zonas.values()) {
+                z.getConexiones().remove(zona);
+            }
+            zonas.remove(nombre);
+        }
     }
 
     public Zona getZona(String nombre) {
         return zonas.get(nombre);
+    }
+
+    public Collection<Zona> getZonas() {
+        return zonas.values();
     }
 
     public void mostrarGrafo() {
@@ -45,16 +56,4 @@ public class CiudadGrafo {
             }
         }
     }
-
-    public void eliminarZona(String nombre) {
-    Zona zona = zonas.get(nombre);
-    if (zona != null) {
-        // Eliminar referencias a esta zona desde otras zonas
-        for (Zona z : zonas.values()) {
-            z.getConexiones().remove(zona);
-        }
-        zonas.remove(nombre);
-    }
-}
-
 }
